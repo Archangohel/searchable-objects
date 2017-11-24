@@ -46,7 +46,7 @@ public class JestSearchIndexService {
 
     public SearchResult search(String query) {
         try {
-            return jestTemplate.search(indicesNames, query);
+            return jestTemplate.search(indicesNames, query, true);
         } catch (JestResultException e) {
             logger.error("Error searching query {}", query, e);
             throw new RuntimeException(e);

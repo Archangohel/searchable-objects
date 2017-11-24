@@ -25,6 +25,9 @@ public class ActiveMqFacade {
     @Autowired
     private QueueBuilder queueBuilder;
 
+    @Autowired
+    private ConsumerMessageListener consumerMessageListener;
+
     private SessionAndQueue jmsSessionAndQueue;
 
     private MessageProducer messageProducer;
@@ -41,6 +44,7 @@ public class ActiveMqFacade {
                 this.jmsSessionAndQueue = queueBuilder.build();
                 this.messageProducer = jmsSessionAndQueue.createProducer();
                 this.messageConsumer = jmsSessionAndQueue.createConsumer();
+                this.messageConsumer.setMessageListener(consumerMessageListener);
                 initialized = true;
             } catch (Exception e) {
                 logger.error("Error starting the broker!");

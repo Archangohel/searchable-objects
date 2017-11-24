@@ -24,6 +24,7 @@ public class IdentityService {
             Field field = null;
             try {
                 field = object.getClass().getDeclaredField(fieldName);
+                field.setAccessible(true);
                 return field.get(object).toString();
             } catch (IllegalArgumentException e) {
                 logger.error("Unable to get the value for entity {} and field {}", object, field, e);
