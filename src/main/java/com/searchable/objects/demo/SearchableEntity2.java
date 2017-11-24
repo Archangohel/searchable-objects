@@ -6,14 +6,14 @@ import com.searchable.objects.core.annotations.Searchable;
  * @auther Archan on 24/11/17.
  */
 @Searchable(idField = "key")
-public class SearchableEntity {
+public class SearchableEntity2 {
     private Long key;
     private String value;
 
-    public SearchableEntity() {
+    public SearchableEntity2() {
     }
 
-    public SearchableEntity(Long key, String value) {
+    public SearchableEntity2(Long key, String value) {
         this.key = key;
         this.value = value;
     }
@@ -39,7 +39,7 @@ public class SearchableEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SearchableEntity that = (SearchableEntity) o;
+        SearchableEntity2 that = (SearchableEntity2) o;
 
         if (key != null ? !key.equals(that.key) : that.key != null) return false;
         return !(value != null ? !value.equals(that.value) : that.value != null);

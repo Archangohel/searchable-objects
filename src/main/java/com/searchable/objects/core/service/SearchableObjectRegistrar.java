@@ -1,6 +1,7 @@
 package com.searchable.objects.core.service;
 
 import com.searchable.objects.core.annotations.Searchable;
+import com.searchable.objects.core.service.elastic.search.JestLoadIndexService;
 import com.searchable.objects.utils.prop.PropReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class SearchableObjectRegistrar {
     @Autowired
     private PropReader propReader;
 
+    @Autowired
+    private JestLoadIndexService jestLoadIndexService;
+
     private ClassPathScanningCandidateComponentProvider scanner;
     private List<Class<? extends Annotation>> annotationList = Arrays.asList(new Class[]{Searchable.class});
 
@@ -39,7 +43,13 @@ public class SearchableObjectRegistrar {
         scanList.stream().forEach(r -> {
             scanPackage(r);
         });
+        buildIndexes();
+    }
 
+    private void buildIndexes() {
+        searchableObjectLookupService.getAllSearchableObjects().stream().forEach(r -> {
+            jestLoadIndexService.buildIndexByClassName(r);
+        });
     }
 
     private void initialiseScanner() {
@@ -52,7 +62,14 @@ public class SearchableObjectRegistrar {
     private void scanPackage(String packageToScan) {
         for (BeanDefinition beanDefinition : this.scanner.findCandidateComponents(packageToScan)) {
             logger.info("Searchable Bean {}", beanDefinition.getBeanClassName());
-            searchableObjectLookupService.registerObjectClass(beanDefinition.getBeanClassName());
+            String className = beanDefinition.getBeanClassName();
+            try {
+                Class<?> clazz = Class.forName(className);
+                String idField = clazz.getAnnotation(Searchable.class).idField();
+                searchableObjectLookupService.registerObjectClass(className, idField);
+            } catch (ClassNotFoundException e) {
+                logger.error("Class {} not found", className);
+            }
         }
     }
 }
