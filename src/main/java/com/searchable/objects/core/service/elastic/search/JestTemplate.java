@@ -163,25 +163,39 @@ public class JestTemplate {
      */
     public <T> boolean addToIndex(String indexName, String type, List<T> objects) {
         logger.info("loading ES index [ " + indexName + " ] , type [ " + type + " ]");
-        long ts1 = System.currentTimeMillis();
+        long ts1 = 0;
+        if (logger.isDebugEnabled()) {
+            ts1 = System.currentTimeMillis();
+        }
+        boolean hasAtleastOneElementToProcess = false;
         Bulk.Builder bulkBuilder = new Bulk.Builder();
         for (T object : objects) {
-            bulkBuilder.addAction(new Index.Builder(object).index(indexName).type(type)
-                    .id(identityService.getKeyAsString(object)).build());
+            String key = identityService.getKeyAsString(object);
+            if (!StringUtils.isEmpty(key)) {
+                bulkBuilder.addAction(new Index.Builder(object).index(indexName).type(type).id(key).build());
+                hasAtleastOneElementToProcess = true;
+            }
         }
-        JestClient jestClient = getJestClient();
-        try {
-            JestResult result = jestClient.execute(bulkBuilder.build());
-            JestHttpResultErrorHandler.handle(result);
-        } catch (Exception e) {
-            logger.error("Error in loading ES index :: " + indexName, e);
+        if (hasAtleastOneElementToProcess) {
+            JestClient jestClient = getJestClient();
+            try {
+                JestResult result = jestClient.execute(bulkBuilder.build());
+                JestHttpResultErrorHandler.handle(result);
+            } catch (Exception e) {
+                logger.error("Error in loading ES index :: " + indexName, e);
+                return false;
+            } finally {
+                closeJestClient(jestClient);
+            }
+            if (logger.isDebugEnabled()) {
+                long ts2 = System.currentTimeMillis();
+                logger.debug("Time taken for loading " + objects.size() + " [ " + type + " ] :: " + (ts2 - ts1) / 1000 + " (seconds)");
+            }
+            return true;
+        } else {
+            logger.info("No element to process");
             return false;
-        } finally {
-            closeJestClient(jestClient);
         }
-        long ts2 = System.currentTimeMillis();
-        logger.info("Time taken for loading " + objects.size() + " [ " + type + " ] :: " + (ts2 - ts1) / 1000 + " (seconds)");
-        return true;
     }
 
     /**

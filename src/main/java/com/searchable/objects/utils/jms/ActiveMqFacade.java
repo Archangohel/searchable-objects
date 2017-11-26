@@ -3,6 +3,7 @@ package com.searchable.objects.utils.jms;
 import org.apache.activemq.broker.BrokerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import java.io.Serializable;
  * @auther Archan on 23/11/17.
  */
 @Component
-public class ActiveMqFacade {
+public class ActiveMqFacade implements DisposableBean {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -54,10 +55,11 @@ public class ActiveMqFacade {
     }
 
     public void destroyQueue() {
-        brokerBuilder.destroy();
-        queueBuilder.destroy();
         destroyConsumer();
         destroyProducer();
+        queueBuilder.destroy();
+        brokerBuilder.destroy();
+        this.initialized = false;
     }
 
     private void destroyConsumer() {
@@ -95,5 +97,10 @@ public class ActiveMqFacade {
             logger.error("Error in creating message!", e);
         }
         return null;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        this.destroyQueue();
     }
 }

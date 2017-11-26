@@ -1,5 +1,6 @@
 package com.searchable.objects.main;
 
+import com.searchable.objects.demo.SearchableEntity2;
 import com.searchable.objects.utils.jms.ActiveMqFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class JmsTesterApp {
         MessageProducer producer = activeMqFacade.getMessageProducer();
 
         // send message
-        TestMessage messageObject = new TestMessage(1l, "Test String message");
+        SearchableEntity2 messageObject = new SearchableEntity2(111l, "Test String message");
         ObjectMessage msg = activeMqFacade.createMessage(messageObject);
         try {
             producer.send(msg);

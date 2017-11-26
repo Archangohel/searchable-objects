@@ -11,8 +11,10 @@ import java.lang.annotation.Target;
  *
  * @auther Archan on 23/11/17.
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdateToIndex {
+    ElementTypes[] elementsToProcess() default {ElementTypes.ARGUMENT};
 
+    Class[] skipObjectTypes() default {};
 }

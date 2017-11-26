@@ -1,5 +1,6 @@
 package com.searchable.objects.core.service;
 
+import com.google.gson.JsonObject;
 import com.searchable.objects.core.service.elastic.search.JestLoadIndexService;
 import com.searchable.objects.core.service.elastic.search.JestSearchIndexService;
 import com.searchable.objects.core.service.elastic.search.SearchQuery;
@@ -21,17 +22,46 @@ public class ObjectServiceFacade {
     @Autowired
     private JestLoadIndexService jestLoadIndexService;
 
-    public SearchResult search(String queryString) {
-        return jestSearchIndexService.search(SearchQuery.getSearchQuery(queryString));
+    public enum ResultType {
+        OBJECT(SearchResult.class), JSON(JsonObject.class);
+        private Class<?> classType;
+
+        ResultType(Class<?> classType) {
+            this.classType = classType;
+        }
+
     }
 
-    public <T> void loadObjects(List<T> objects) {
-        jestLoadIndexService.saveToIndex(objects);
+    public Object search(String queryString) {
+        return search(queryString, ResultType.JSON);
     }
 
-    public <T> void loadObject(T object) {
+    public Object search(String queryString, ResultType resultType) {
+        SearchResult resultObject = jestSearchIndexService.search(SearchQuery.getSearchQuery(queryString));
+        if (ResultType.JSON.equals(resultType)) {
+            return resultObject.getJsonObject();
+        } else if (ResultType.OBJECT.equals(resultType)) {
+            return resultObject;
+        } else {
+            return null;
+        }
+    }
+
+    public <T> boolean loadObjects(List<T> objects) {
+        return jestLoadIndexService.saveToIndex(objects);
+    }
+
+    public <T> boolean loadObject(T object) {
         List<T> list = new ArrayList<>();
         list.add(object);
-        jestLoadIndexService.saveToIndex(list);
+        return jestLoadIndexService.saveToIndex(list);
+    }
+
+    public <T> boolean deleteObjects(List<T> objects) {
+        return false;
+    }
+
+    public <T> boolean deleteObject(T object) {
+        return false;
     }
 }

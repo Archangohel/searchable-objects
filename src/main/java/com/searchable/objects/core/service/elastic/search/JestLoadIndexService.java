@@ -17,13 +17,14 @@ public class JestLoadIndexService {
     @Autowired
     private IndexNameService indexNameService;
 
-    public <T> void saveToIndex(List<T> objects) {
+    public <T> boolean saveToIndex(List<T> objects) {
         Assert.notEmpty(objects, "Objects cant be empty");
         String indexName = indexNameService.getIndexNameForObject(objects.get(0));
         String simpleName = objects.get(0).getClass().getSimpleName();
         if (indexName != null) {
-            jestTemplate.addToIndex(indexName, simpleName, objects);
+            return jestTemplate.addToIndex(indexName, simpleName, objects);
         }
+        return false;
     }
 
     public void buildIndex(String indexName) {

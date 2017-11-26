@@ -2,11 +2,13 @@ package com.searchable.objects.demo;
 
 import com.searchable.objects.core.annotations.Searchable;
 
+import java.io.Serializable;
+
 /**
  * @auther Archan on 24/11/17.
  */
 @Searchable(idField = "key")
-public class SearchableEntity {
+public class SearchableEntity implements Serializable{
     private Long key;
     private String value;
 
