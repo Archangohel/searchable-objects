@@ -2,9 +2,8 @@ package com.searchable.objects.main;
 
 import com.google.gson.JsonObject;
 import com.searchable.objects.core.service.ObjectServiceFacade;
-import com.searchable.objects.demo.DemoClientMethods;
-import com.searchable.objects.demo.DemoClientMethods1;
-import com.searchable.objects.demo.SearchableEntity;
+import com.searchable.objects.demo.ClientCode;
+import com.searchable.objects.demo.Entity1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -25,19 +24,11 @@ public class DefaultApp {
     public static void main(String args[]) {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        DemoClientMethods demoClientMethods = context.getBean(DemoClientMethods.class);
-//        demoClientMethods.processArgs(new SearchableEntity(111l, "DefaultApp processArgs"));
-//        demoClientMethods.processWithoutAdvice(null);
-//        demoClientMethods.processReturnValue();
-//        demoClientMethods.process(new SearchableEntity(999l, "DefaultApp processArgs"));
-        demoClientMethods.deleteMethod(null);
+        ClientCode clientCode = context.getBean(ClientCode.class);
 
-//        DemoClientMethods1 demoClientMethods1 = context.getBean(DemoClientMethods1.class);
-//        demoClientMethods1.processArgs(new SearchableEntity(222l, "DefaultApp processArgs"));
-//        demoClientMethods1.processWithoutAdvice(null);
-//        demoClientMethods1.processReturnValue();
-//        demoClientMethods1.process(new SearchableEntity(2229l, "DefaultApp processArgs"));
-
+        clientCode.processArgsForUpdate(Entity1.newInstance());
+        Entity1 entity1 = clientCode.processArgsAndReturnValueForUpdate(Entity1.newInstance());
+        clientCode.processArgsForDelete(entity1);
         try {
             TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
@@ -45,7 +36,7 @@ public class DefaultApp {
         }
 
         ObjectServiceFacade objectServiceFacade = context.getBean(ObjectServiceFacade.class);
-        JsonObject searchResult = objectServiceFacade.search("DefaultApp");
+        JsonObject searchResult = objectServiceFacade.search("val-1928487485");
         logger.info("Result JSON :: {}", searchResult);
         context.close();
     }
