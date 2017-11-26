@@ -16,7 +16,7 @@ public class Entity1 implements Serializable {
 
     private Long id;
     private String name;
-    private Map<String, String> valueMap;
+    private EntityChild child;
 
     public Long getId() {
         return id;
@@ -34,24 +34,19 @@ public class Entity1 implements Serializable {
         this.name = name;
     }
 
-    public Map<String, String> getValueMap() {
-        return valueMap;
+    public EntityChild getChild() {
+        return child;
     }
 
-    public void setValueMap(Map<String, String> valueMap) {
-        this.valueMap = valueMap;
+    public void setChild(EntityChild child) {
+        this.child = child;
     }
 
     public static Entity1 newInstance() {
         Entity1 entity1 = new Entity1();
         entity1.setId(random.nextLong());
         entity1.setName("TestName" + random.nextInt());
-        Map<String, String> map = new HashMap<>();
-        final int maxLoopCount = random.nextInt(10);
-        for (int i = 0; i < maxLoopCount; i++) {
-            map.put(random.nextInt() + "", "val-" + random.nextInt());
-        }
-        entity1.setValueMap(map);
+        entity1.setChild(EntityChild.newInstance());
         return entity1;
     }
 }

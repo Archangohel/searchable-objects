@@ -73,9 +73,7 @@ public class DeleteFromIndexAspect {
                     }
                     if (Collection.class.isAssignableFrom(arg.getClass())) {
                         Collection<?> collection = Collection.class.cast(arg);
-                        collection.stream().forEach(r -> {
-                            processObject(r);
-                        });
+                        collection.stream().forEach(r -> processObject(r));
                     } else if (Map.class.isAssignableFrom(arg.getClass())) {
                         Map<?, ?> map = Map.class.cast(arg);
                         map.entrySet().stream().forEach(r -> {
@@ -116,8 +114,8 @@ public class DeleteFromIndexAspect {
 
     private void processObject(Object object) {
         if (searchableObjectLookupService.isObjectClassSearchable(object.getClass())) {
-            ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(object, JmsMessage.ActionType.DELETE));
             try {
+                ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(object, JmsMessage.ActionType.DELETE));
                 activeMqFacade.getMessageProducer().send(message);
             } catch (Exception e) {
                 logger.error("Error in sending the object to JMS for adding to index {}. Ignoring the exception.", object, e);

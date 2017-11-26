@@ -116,8 +116,8 @@ public class UpdateToIndexAspect {
 
     private void processObject(Object object) {
         if (searchableObjectLookupService.isObjectClassSearchable(object.getClass())) {
-            ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(object, JmsMessage.ActionType.SAVE));
             try {
+                ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(object, JmsMessage.ActionType.SAVE));
                 activeMqFacade.getMessageProducer().send(message);
             } catch (Exception e) {
                 logger.error("Error in sending the object to JMS for adding to index {}. Ignoring the exception.", object, e);
