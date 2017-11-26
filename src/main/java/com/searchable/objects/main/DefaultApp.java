@@ -1,5 +1,6 @@
 package com.searchable.objects.main;
 
+import com.google.gson.JsonObject;
 import com.searchable.objects.core.service.ObjectServiceFacade;
 import com.searchable.objects.demo.DemoClientMethods;
 import com.searchable.objects.demo.DemoClientMethods1;
@@ -25,16 +26,17 @@ public class DefaultApp {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
         DemoClientMethods demoClientMethods = context.getBean(DemoClientMethods.class);
-        demoClientMethods.processArgs(new SearchableEntity(111l, "DefaultApp processArgs"));
-        demoClientMethods.processWithoutAdvice(null);
-        demoClientMethods.processReturnValue();
-        demoClientMethods.process(new SearchableEntity(999l, "DefaultApp processArgs"));
+//        demoClientMethods.processArgs(new SearchableEntity(111l, "DefaultApp processArgs"));
+//        demoClientMethods.processWithoutAdvice(null);
+//        demoClientMethods.processReturnValue();
+//        demoClientMethods.process(new SearchableEntity(999l, "DefaultApp processArgs"));
+        demoClientMethods.deleteMethod(null);
 
-        DemoClientMethods1 demoClientMethods1 = context.getBean(DemoClientMethods1.class);
-        demoClientMethods1.processArgs(new SearchableEntity(222l, "DefaultApp processArgs"));
-        demoClientMethods1.processWithoutAdvice(null);
-        demoClientMethods1.processReturnValue();
-        demoClientMethods1.process(new SearchableEntity(2229l, "DefaultApp processArgs"));
+//        DemoClientMethods1 demoClientMethods1 = context.getBean(DemoClientMethods1.class);
+//        demoClientMethods1.processArgs(new SearchableEntity(222l, "DefaultApp processArgs"));
+//        demoClientMethods1.processWithoutAdvice(null);
+//        demoClientMethods1.processReturnValue();
+//        demoClientMethods1.process(new SearchableEntity(2229l, "DefaultApp processArgs"));
 
         try {
             TimeUnit.SECONDS.sleep(5);
@@ -43,7 +45,7 @@ public class DefaultApp {
         }
 
         ObjectServiceFacade objectServiceFacade = context.getBean(ObjectServiceFacade.class);
-        Object searchResult = objectServiceFacade.search("DefaultApp");
+        JsonObject searchResult = objectServiceFacade.search("DefaultApp");
         logger.info("Result JSON :: {}", searchResult);
         context.close();
     }

@@ -1,5 +1,6 @@
 package com.searchable.objects.demo;
 
+import com.searchable.objects.core.annotations.DeleteFromIndex;
 import com.searchable.objects.core.annotations.ElementTypes;
 import com.searchable.objects.core.annotations.UpdateToIndex;
 import org.springframework.stereotype.Component;
@@ -27,5 +28,10 @@ public class DemoClientMethods {
 
     public SearchableEntity processWithoutAdvice(SearchableEntity arg1) {
         return new SearchableEntity(1224l, "ReturnedValue from public SearchableEntity processWithoutAdvice(SearchableEntity arg1)");
+    }
+
+    @DeleteFromIndex(elementsToProcess = {ElementTypes.RETURN})
+    public SearchableEntity deleteMethod(SearchableEntity arg1) {
+        return new SearchableEntity(1223l, "ReturnedValue from public SearchableEntity process(SearchableEntity arg1)");
     }
 }

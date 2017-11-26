@@ -1,6 +1,7 @@
 package com.searchable.objects.core.service;
 
 import com.google.gson.JsonObject;
+import com.searchable.objects.core.service.elastic.search.JestDeleteIndexService;
 import com.searchable.objects.core.service.elastic.search.JestLoadIndexService;
 import com.searchable.objects.core.service.elastic.search.JestSearchIndexService;
 import com.searchable.objects.core.service.elastic.search.SearchQuery;
@@ -22,6 +23,9 @@ public class ObjectServiceFacade {
     @Autowired
     private JestLoadIndexService jestLoadIndexService;
 
+    @Autowired
+    private JestDeleteIndexService jestDeleteIndexService;
+
     public enum ResultType {
         OBJECT(SearchResult.class), JSON(JsonObject.class);
         private Class<?> classType;
@@ -30,20 +34,23 @@ public class ObjectServiceFacade {
             this.classType = classType;
         }
 
+        public Class<?> getClassType() {
+            return classType;
+        }
     }
 
-    public Object search(String queryString) {
-        return search(queryString, ResultType.JSON);
+    public JsonObject search(String queryString) {
+        return search(queryString, JsonObject.class);
     }
 
-    public Object search(String queryString, ResultType resultType) {
+    public <T> T search(String queryString, Class<T> clazz) {
         SearchResult resultObject = jestSearchIndexService.search(SearchQuery.getSearchQuery(queryString));
-        if (ResultType.JSON.equals(resultType)) {
-            return resultObject.getJsonObject();
-        } else if (ResultType.OBJECT.equals(resultType)) {
-            return resultObject;
+        if (JsonObject.class.isAssignableFrom(clazz)) {
+            return (T) resultObject.getJsonObject();
+        } else if (SearchResult.class.isAssignableFrom(clazz)) {
+            return (T) resultObject;
         } else {
-            return null;
+            throw new IllegalArgumentException("Return type {} not supported");
         }
     }
 
@@ -58,10 +65,13 @@ public class ObjectServiceFacade {
     }
 
     public <T> boolean deleteObjects(List<T> objects) {
-        return false;
+        return jestDeleteIndexService.deleteFromIndex(objects);
     }
 
     public <T> boolean deleteObject(T object) {
-        return false;
+        List<T> list = new ArrayList<>();
+        list.add(object);
+        return jestDeleteIndexService.deleteFromIndex(list);
     }
+
 }

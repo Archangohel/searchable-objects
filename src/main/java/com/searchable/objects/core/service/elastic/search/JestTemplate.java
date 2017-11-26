@@ -5,10 +5,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.Index;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
+import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
@@ -190,6 +187,51 @@ public class JestTemplate {
             if (logger.isDebugEnabled()) {
                 long ts2 = System.currentTimeMillis();
                 logger.debug("Time taken for loading " + objects.size() + " [ " + type + " ] :: " + (ts2 - ts1) / 1000 + " (seconds)");
+            }
+            return true;
+        } else {
+            logger.info("No element to process");
+            return false;
+        }
+    }
+
+    /**
+     * This method will remove objects to the type under the specified index.
+     *
+     * @param indexName
+     * @param type
+     * @param objects
+     * @return Status of the operation. TRUE represent successful and FALSE represent failure.
+     */
+    public <T> boolean removeFromIndex(String indexName, String type, List<T> objects) {
+        logger.info("Removing from ES index [ " + indexName + " ] , type [ " + type + " ]");
+        long ts1 = 0;
+        if (logger.isDebugEnabled()) {
+            ts1 = System.currentTimeMillis();
+        }
+        boolean hasAtleastOneElementToProcess = false;
+        Bulk.Builder bulkBuilder = new Bulk.Builder();
+        for (T object : objects) {
+            String key = identityService.getKeyAsString(object);
+            if (!StringUtils.isEmpty(key)) {
+                bulkBuilder.addAction(new Delete.Builder(key).index(indexName).type(type).build());
+                hasAtleastOneElementToProcess = true;
+            }
+        }
+        if (hasAtleastOneElementToProcess) {
+            JestClient jestClient = getJestClient();
+            try {
+                JestResult result = jestClient.execute(bulkBuilder.build());
+                JestHttpResultErrorHandler.handle(result);
+            } catch (Exception e) {
+                logger.error("Error in delete from ES index :: " + indexName, e);
+                return false;
+            } finally {
+                closeJestClient(jestClient);
+            }
+            if (logger.isDebugEnabled()) {
+                long ts2 = System.currentTimeMillis();
+                logger.debug("Time taken for deleting " + objects.size() + " [ " + type + " ] :: " + (ts2 - ts1) / 1000 + " (seconds)");
             }
             return true;
         } else {
