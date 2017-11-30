@@ -1,8 +1,6 @@
 package com.searchable.objects.main;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -10,8 +8,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @Configuration
-@EnableTransactionManagement
 @ComponentScan(basePackages = "com.searchable.objects.*")
-@PropertySource(value = {"classpath:searchable-objects.properties"})
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+@PropertySources({
+        @PropertySource(name="defaultProperties", value = {"classpath:searchable-objects.properties"}),
+        @PropertySource(name = "overrideProperties", value = "classpath:searchable-objects-overrides.properties", ignoreResourceNotFound = true)
+})
 public class AppConfig {
 }

@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @Configuration
-@EnableTransactionManagement
 @ComponentScan(basePackages = "com.searchable.objects.*")
 @PropertySource(value = {"classpath:searchable-objects-test.properties"})
 public class TestAppConfig {

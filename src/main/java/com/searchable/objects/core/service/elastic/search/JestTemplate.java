@@ -167,7 +167,7 @@ public class JestTemplate {
         boolean hasAtleastOneElementToProcess = false;
         Bulk.Builder bulkBuilder = new Bulk.Builder();
         for (T object : objects) {
-            String key = identityService.getKeyAsString(object);
+            String key = identityService.getKeyAsString(object, null);
             if (!StringUtils.isEmpty(key)) {
                 bulkBuilder.addAction(new Index.Builder(object).index(indexName).type(type).id(key).build());
                 hasAtleastOneElementToProcess = true;
@@ -212,7 +212,7 @@ public class JestTemplate {
         boolean hasAtleastOneElementToProcess = false;
         Bulk.Builder bulkBuilder = new Bulk.Builder();
         for (T object : objects) {
-            String key = identityService.getKeyAsString(object);
+            String key = identityService.getKeyAsString(object, null);
             if (!StringUtils.isEmpty(key)) {
                 bulkBuilder.addAction(new Delete.Builder(key).index(indexName).type(type).build());
                 hasAtleastOneElementToProcess = true;

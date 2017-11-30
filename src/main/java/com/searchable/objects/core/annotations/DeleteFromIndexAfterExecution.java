@@ -1,5 +1,9 @@
 package com.searchable.objects.core.annotations;
 
+/**
+ * @auther Archan on 29/11/17.
+ */
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,10 +15,7 @@ import java.lang.annotation.Target;
  *
  * @auther Archan on 23/11/17.
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UpdateToIndex {
-    ElementTypes[] elementsToProcess() default {ElementTypes.ARGUMENT};
-
-    Class[] skipObjectTypes() default {};
+public @interface DeleteFromIndexAfterExecution {
 }

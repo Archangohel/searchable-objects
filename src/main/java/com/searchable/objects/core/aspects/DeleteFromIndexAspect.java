@@ -1,14 +1,11 @@
 package com.searchable.objects.core.aspects;
 
-import com.searchable.objects.core.annotations.DeleteFromIndex;
-import com.searchable.objects.core.annotations.ElementTypes;
 import com.searchable.objects.core.service.SearchableObjectLookupService;
 import com.searchable.objects.utils.jms.ActiveMqFacade;
 import com.searchable.objects.utils.jms.JmsMessage;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,39 +29,19 @@ public class DeleteFromIndexAspect {
     @Autowired
     private SearchableObjectLookupService searchableObjectLookupService;
 
-    @Pointcut("@target(typeAnnotation)")
-    public void beanAnnotatedWithMonitor(DeleteFromIndex typeAnnotation) {
+
+    @Around("@annotation(com.searchable.objects.core.annotations.DeleteFromIndexBeforeExecution)")
+    public Object aroundMethodUpdateToIndex(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        return aroundDeleteFromIndex(proceedingJoinPoint, true, false);
     }
 
-    @Pointcut("@annotation(methodAnnotation)")
-    public void annotationPointCutDefinition(DeleteFromIndex methodAnnotation) {
+    @Around("@annotation(com.searchable.objects.core.annotations.DeleteFromIndexBeforeExecution)")
+    public Object aroundTypeUpdateToIndex(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        return aroundDeleteFromIndex(proceedingJoinPoint, false, true);
     }
 
-    @Pointcut("execution(* *(..))")
-    public void atExecution() {
-    }
-
-    @Around(value = "annotationPointCutDefinition(methodAnnotation) && atExecution()")
-    public Object aroundMethodUpdateToIndex(ProceedingJoinPoint proceedingJoinPoint, DeleteFromIndex methodAnnotation) throws Throwable {
-        return aroundUpdateToIndex(proceedingJoinPoint, methodAnnotation);
-    }
-
-    @Around(value = "beanAnnotatedWithMonitor(typeAnnotation) && atExecution()")
-    public Object aroundTypeUpdateToIndex(ProceedingJoinPoint proceedingJoinPoint, DeleteFromIndex typeAnnotation) throws Throwable {
-        return aroundUpdateToIndex(proceedingJoinPoint, typeAnnotation);
-    }
-
-    private Object aroundUpdateToIndex(ProceedingJoinPoint proceedingJoinPoint, DeleteFromIndex annotation) throws Throwable {
+    private Object aroundDeleteFromIndex(ProceedingJoinPoint proceedingJoinPoint, boolean processArguments, boolean processReturnValue) throws Throwable {
         // pre processing
-        boolean processArguments = false;
-        boolean processReturnValue = false;
-        for (ElementTypes elementTypeToProcess : annotation.elementsToProcess()) {
-            if (elementTypeToProcess.equals(ElementTypes.ARGUMENT)) {
-                processArguments = true;
-            } else if (elementTypeToProcess.equals(ElementTypes.RETURN)) {
-                processReturnValue = true;
-            }
-        }
         if (processArguments) {
             for (Object arg : proceedingJoinPoint.getArgs()) {
                 if (arg != null) {
@@ -113,9 +90,10 @@ public class DeleteFromIndexAspect {
     }
 
     private void processObject(Object object) {
-        if (searchableObjectLookupService.isObjectClassSearchable(object.getClass())) {
+        Object objectFeedJms = searchableObjectLookupService.convert(object);
+        if (searchableObjectLookupService.isObjectSearchable(objectFeedJms)) {
             try {
-                ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(object, JmsMessage.ActionType.DELETE));
+                ObjectMessage message = activeMqFacade.createMessage(new JmsMessage(objectFeedJms, JmsMessage.ActionType.DELETE));
                 activeMqFacade.getMessageProducer().send(message);
             } catch (Exception e) {
                 logger.error("Error in sending the object to JMS for adding to index {}. Ignoring the exception.", object, e);

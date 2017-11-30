@@ -1,22 +1,10 @@
 package com.searchable.objects.main;
 
-import com.searchable.objects.demo.Entity1;
-import com.searchable.objects.utils.jms.ActiveMqFacade;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
-
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @auther Archan on 23/11/17.
  */
 public class JmsTesterApp {
-    private static Logger logger = LoggerFactory.getLogger(JmsTesterApp.class);
+    /*private static Logger logger = LoggerFactory.getLogger(JmsTesterApp.class);
 
     public static void main(String args[]) {
         boolean testConsumerListener = true;
@@ -60,5 +48,5 @@ public class JmsTesterApp {
         }
         // cleanup
         activeMqFacade.destroyQueue();
-    }
+    }*/
 }

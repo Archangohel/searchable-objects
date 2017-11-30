@@ -57,8 +57,8 @@ public class ActiveMqFacade implements DisposableBean {
     public void destroyQueue() {
         destroyConsumer();
         destroyProducer();
-        queueBuilder.destroy();
         brokerBuilder.destroy();
+        queueBuilder.destroy();
         this.initialized = false;
     }
 

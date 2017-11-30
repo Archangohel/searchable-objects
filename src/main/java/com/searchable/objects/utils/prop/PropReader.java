@@ -14,12 +14,27 @@ import java.util.Properties;
 public class PropReader {
 
     private String propertyFile = "searchable-objects.properties";
+    private String propertyFileOverrides = "searchable-objects-overrides.properties";
+
     private Properties properties;
 
     @PostConstruct
     public void init() {
-        ClassPathResource resource = new ClassPathResource(propertyFile);
         this.properties = new Properties();
+        loadDefault();
+        loadOverrides();
+    }
+
+    private void loadOverrides() {
+        loadPropertyFile(propertyFileOverrides);
+    }
+
+    private void loadDefault() {
+        loadPropertyFile(propertyFile);
+    }
+
+    private void loadPropertyFile(String classPathPropertyFile) {
+        ClassPathResource resource = new ClassPathResource(classPathPropertyFile);
         try {
             properties.load(resource.getInputStream());
         } catch (IOException e) {

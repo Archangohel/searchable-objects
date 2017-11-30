@@ -12,7 +12,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestAppConfig.class})
-@WebAppConfiguration
 public class ClientCodeTest {
 
     @Autowired
